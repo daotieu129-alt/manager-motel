@@ -1065,7 +1065,7 @@ function RoomCard(props: {
             ) : null}
           {room.guest_phone ? (
             <div>
-              SĐT: <b>{room.guest_phone}</b>
+              {room.guest_phone && (
             </div>
           )}
         </div>
