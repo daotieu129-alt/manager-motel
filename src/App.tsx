@@ -5,6 +5,8 @@ import { AnimatePresence } from "framer-motion";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
+import Setup from "./pages/Setup";
+
 // Lazy-load pages to reduce bundle size (especially Rooms/Cashbook)
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
@@ -56,6 +58,15 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/setup"
+            element={
+              <ProtectedRoute>
+                <Setup />
+              </ProtectedRoute>
+            }
+         />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -437,6 +437,9 @@ export default function Dashboard() {
                   <button className={`${btnPrimaryClass} w-full`} onClick={() => nav("/rooms")}>
                     Quản lý phòng / Đặt phòng
                   </button>
+                <button className={`${btnOutlineClass} w-full`} onClick={() => nav("/setup")}>
+                  Thiết lập cơ sở
+                </button>
                   
 
                   {/* ✅ FIX #1: correct route */}
