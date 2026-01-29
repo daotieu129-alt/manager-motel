@@ -1,5 +1,3 @@
-
-
 type RoomLike = {
   id?: string;
   name?: string;
@@ -23,6 +21,9 @@ export default function CheckoutModal({
   onCheckout,
   onClose,
 }: Props) {
+  const confirmDisabled =
+    submittingCheckout || !totalAmountInput.trim();
+
   return (
     <div
       style={{
@@ -42,30 +43,92 @@ export default function CheckoutModal({
           width: "min(520px, 100%)",
           background: "white",
           borderRadius: 12,
-          padding: 16,
+          padding: 20,
+          boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 style={{ margin: 0, marginBottom: 12 }}>
+        {/* Title */}
+        <h3
+          style={{
+            margin: 0,
+            marginBottom: 16,
+            fontSize: 18,
+            fontWeight: 800,
+          }}
+        >
           Checkout {room?.name || room?.number || "room"}
         </h3>
 
-        <label style={{ display: "block", marginBottom: 8 }}>
+        {/* Amount */}
+        <label
+          style={{
+            display: "block",
+            marginBottom: 6,
+            fontWeight: 600,
+          }}
+        >
           Total amount
         </label>
         <input
           value={totalAmountInput}
           onChange={(e) => setTotalAmountInput(e.target.value)}
           placeholder="e.g. 350000"
-          style={{ width: "100%", padding: 10, borderRadius: 8, border: "1px solid #ddd" }}
+          type="number"
+          style={{
+            width: "100%",
+            padding: 12,
+            borderRadius: 10,
+            border: "1px solid #ddd",
+            fontSize: 15,
+            outline: "none",
+          }}
         />
 
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 16 }}>
-          <button onClick={onClose} disabled={submittingCheckout}>
+        {/* Actions */}
+        <div
+          style={{
+            display: "flex",
+            gap: 10,
+            justifyContent: "flex-end",
+            marginTop: 20,
+          }}
+        >
+          {/* Cancel */}
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              padding: "10px 16px",
+              borderRadius: 10,
+              border: "1px solid #ddd",
+              background: "#fff",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
             Cancel
           </button>
-          <button onClick={onCheckout} disabled={submittingCheckout || !totalAmountInput.trim()}>
-            {submittingCheckout ? "Processing..." : "Confirm checkout"}
+
+          {/* Confirm */}
+          <button
+            type="button"
+            onClick={onCheckout}
+            disabled={confirmDisabled}
+            style={{
+              padding: "10px 16px",
+              borderRadius: 10,
+              border: "1px solid #eab308",
+              background: confirmDisabled ? "#e5e7eb" : "#facc15",
+              color: "#111",
+              fontWeight: 800,
+              cursor: confirmDisabled ? "not-allowed" : "pointer",
+              opacity: submittingCheckout ? 0.8 : 1,
+            }}
+          >
+            {submittingCheckout
+              ? "Processing..."
+              : "Confirm checkout"}
           </button>
         </div>
       </div>
