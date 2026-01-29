@@ -1058,14 +1058,14 @@ function RoomCard(props: {
       {/* Guest info (nếu có) */}
       {(room.guest_name || room.guest_phone) && (
         <div className="mt-2 text-sm text-gray-600">
-          {room.guest_name ? (
+          {room.guest_name && (
             <div>
               Khách: <b>{room.guest_name}</b>
             </div>
-            ) : null}
-          {room.guest_phone ? (
+          )}
+          {room.guest_phone && (
             <div>
-              {room.guest_phone && (
+              SĐT: <b>{room.guest_phone}</b>
             </div>
           )}
         </div>
