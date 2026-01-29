@@ -1067,7 +1067,11 @@ function RoomCard(props: {
             <div>
               SĐT: <b>{room.guest_phone}</b>
             </div>
-          ) : null}
+          )}
+        </div>
+      )}
+
+        {/* Check-in time – luôn hiện nếu có */}
           {room.check_in_at && (
             <div className="text-xs text-gray-500 mt-1">
               Check-in:{" "}
@@ -1079,8 +1083,7 @@ function RoomCard(props: {
               </b>
             </div>
           )}
-        </div>
-      )}
+
 
       {room.note && <div className="mt-2 text-sm text-gray-500 italic">{room.note}</div>}
 
