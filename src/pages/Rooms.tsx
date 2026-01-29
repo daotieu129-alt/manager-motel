@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import { signOut } from "../lib/auth";
 import { createIncomePaymentFromStay } from "../lib/payments";
+import CheckoutModal from "../components/CheckoutModal";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES
@@ -22,6 +23,7 @@ type Room = {
   // NEW: show guest info on room card after check-in
   guest_name?: string | null;
   guest_phone?: string | null;
+  check_in_at?: string | null;
 };
 
 type Property = {
@@ -176,6 +178,7 @@ export default function Rooms() {
       default_price: r.default_price != null ? Number(r.default_price) : null,
       guest_name: null,
       guest_phone: null,
+      check_in_at: null,
     }));
 
     // NEW: attach guest_name / guest_phone from latest OPEN stay for each room
@@ -189,12 +192,20 @@ export default function Rooms() {
         .order("created_at", { ascending: false });
 
       if (!stayErr && openStays) {
-        const stayByRoom = new Map<string, { guest_name: string | null; guest_phone: string | null }>();
+        const stayByRoom = new Map<
+          string,
+          { 
+            guest_name: string | null;
+            guest_phone: string | null;
+            check_in_at: string | null; 
+          }
+        >();
         for (const s of openStays) {
           if (!stayByRoom.has(s.room_id)) {
             stayByRoom.set(s.room_id, {
               guest_name: (s.guest_name ?? null) as string | null,
               guest_phone: (s.guest_phone ?? null) as string | null,
+              check_in_at: (s.created_at ?? null) as string | null,
             });
           }
         }
@@ -204,6 +215,7 @@ export default function Rooms() {
           if (st) {
             r.guest_name = st.guest_name;
             r.guest_phone = st.guest_phone;
+            r.check_in_at = st.check_in_at;
           }
         }
       }
@@ -1046,8 +1058,27 @@ function RoomCard(props: {
       {/* Guest info (nếu có) */}
       {(room.guest_name || room.guest_phone) && (
         <div className="mt-2 text-sm text-gray-600">
-          {room.guest_name ? <div>Khách: <b>{room.guest_name}</b></div> : null}
-          {room.guest_phone ? <div>SĐT: <b>{room.guest_phone}</b></div> : null}
+          {room.guest_name ? (
+            <div>
+              Khách: <b>{room.guest_name}</b>
+            </div>
+            ) : null}
+          {room.guest_phone ? (
+            <div>
+              SĐT: <b>{room.guest_phone}</b>
+            </div>
+          ) : null}
+          {room.check_in_at && (
+            <div className="text-xs text-gray-500 mt-1">
+              Check-in:{" "}
+              <b>
+                {new Date(room.check_in_at).toLocaleTimeString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </b>
+            </div>
+          )}
         </div>
       )}
 
@@ -1130,64 +1161,6 @@ function RoomCard(props: {
             Chuyển: Đang dọn
           </button>
         )}
-      </div>
-    </div>
-  );
-}
-
-function CheckoutModal(props: {
-  room: Room;
-  totalAmountInput: string;
-  setTotalAmountInput: (v: string) => void;
-  submittingCheckout: boolean;
-  onCheckout: () => void;
-  onClose: () => void;
-}) {
-  const { room, totalAmountInput, setTotalAmountInput, submittingCheckout, onCheckout, onClose } = props;
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white border-2 border-gray-200 rounded-lg shadow-sm p-6 w-full max-w-md"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="border-l-4 border-yellow-400 pl-4 py-1 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Trả phòng</h2>
-          <p className="text-sm text-gray-600 mt-0.5">
-            Phòng <b>{room.name}</b> • Trạng thái: <b>{mapStatusVN(room.status)}</b>
-          </p>
-        </div>
-
-        <label className="block text-sm font-semibold text-gray-700 mb-2">Tổng tiền (VND)</label>
-        <input
-          type="number"
-          value={totalAmountInput}
-          onChange={(e) => setTotalAmountInput(e.target.value)}
-          className="w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-[15px] text-gray-900 hover:border-gray-400 focus:border-yellow-400 focus:outline-none transition-all"
-          placeholder="Nhập tổng tiền"
-        />
-
-        <div className="flex gap-2 mt-4 justify-end">
-          <button
-            type="button"
-            className="rounded-md border-2 border-gray-300 bg-white py-2 px-4 text-[15px] font-semibold text-gray-700 hover:bg-gray-50"
-            onClick={onClose}
-            disabled={submittingCheckout}
-          >
-            Đóng
-          </button>
-          <button
-            type="button"
-            className="rounded-md bg-yellow-400 py-2 px-4 text-[15px] font-bold text-gray-900 hover:bg-yellow-500 border-2 border-yellow-500 disabled:opacity-60"
-            onClick={onCheckout}
-            disabled={submittingCheckout}
-          >
-            {submittingCheckout ? "Đang xử lý..." : "Xác nhận trả phòng"}
-          </button>
-        </div>
       </div>
     </div>
   );
