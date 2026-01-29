@@ -192,10 +192,35 @@ export default function Dashboard() {
         );
         setMonthRevenue(sum);
       }
+      // ===== STAYS METRICS (CHECK-IN / CHECK-OUT TODAY) =====
+      const endOfDay = new Date(startOfDay);
+      endOfDay.setDate(endOfDay.getDate() + 1);
 
-      // (Optional) stays metrics – keep null for now to avoid schema mismatch
-      setTodayCheckIn(null);
-      setTodayCheckOut(null);
+      // Check-in hôm nay
+      const { count: ciCount, error: ciErr } = await supabase
+        .from("stays")
+        .select("id", { count: "exact", head: true })
+        .eq("property_id", pid)
+        .gte("check_in_at", startOfDay.toISOString())
+        .lt("check_in_at", endOfDay.toISOString());
+
+      if (!mountedRef.current) return;
+      setTodayCheckIn(ciErr ? null : (ciCount ?? 0));
+
+      
+       // Check-out hôm nay
+      const { count: coCount, error: coErr } = await supabase
+        .from("stays")
+        .select("id", { count: "exact", head: true })
+        .eq("property_id", pid)
+        .gte("check_out_at", startOfDay.toISOString())
+        .lt("check_out_at", endOfDay.toISOString())
+        .eq("status", "CLOSED");
+      
+      if (!mountedRef.current) return;
+      setTodayCheckOut(coErr ? null : (coCount ?? 0));
+
+
     } catch {
       // ignore
     }
